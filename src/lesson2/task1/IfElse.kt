@@ -185,8 +185,6 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
 
   if (min + middle < max) {
     return - 1
-  } else if (a == b && b == c) {
-    return 1
   } else {
     // Вычисляем косинус угла, лежащего напротив большей стороны
     // по закону синусов
