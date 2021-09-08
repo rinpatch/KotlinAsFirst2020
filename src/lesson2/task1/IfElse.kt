@@ -3,11 +3,7 @@
 package lesson2.task1
 
 import lesson1.task1.discriminant
-import kotlin.math.max
-import kotlin.math.PI
-import kotlin.math.sqrt
-import kotlin.math.acos
-import kotlin.math.abs
+import kotlin.math.*
 
 // Урок 2: ветвления (здесь), логический тип (см. 2.2).
 // Максимальное количество баллов = 6
@@ -207,8 +203,16 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
  */
 
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
-    val length = (a..b).intersect(c..d).size
-    return if (length == 0) -1 else length - 1
+    // Commenting out the pretty solution, because teachers
+    //val length = (a..b).intersect(c..d).size
+    //return if (length == 0) -1 else length - 1
+    return when {
+        c in a..b -> min(d, b) - c
+        d in a..b -> d - a
+        a in c..d -> min(b, d) - a
+        b in c..d -> b - c
+        else -> -1
+    }
 }
 
 fun main() {
