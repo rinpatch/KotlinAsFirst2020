@@ -72,17 +72,17 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
 fun ageDescription(age: Int): String {
-  val endsOnOne = age % 10 == 1
-  val betweenTwoAndFour = age % 10 in 2..4
-  val teen = age % 100 in 10..19
-  if (!(endsOnOne || betweenTwoAndFour) || teen) {
-    return "$age лет"
-  } else if (endsOnOne) {
-    return "$age год"
-  } else {
-    return "$age года"
-  }
-} 
+    val endsOnOne = age % 10 == 1
+    val betweenTwoAndFour = age % 10 in 2..4
+    val teen = age % 100 in 10..19
+    return if (!(endsOnOne || betweenTwoAndFour) || teen) {
+        "$age лет"
+    } else if (endsOnOne) {
+        "$age год"
+    } else {
+        "$age года"
+    }
+}
 
 /**
  * Простая (2 балла)
@@ -96,20 +96,18 @@ fun timeForHalfWay(
     t2: Double, v2: Double,
     t3: Double, v3: Double
 ): Double {
-  var halfWay = (t1 * v1 + t2 * v2  + t3 * v3) / 2
-  var halfTime = 0.0
-  for (tv in listOf(listOf(t1, v1), listOf(t2, v2), listOf(t3, v3))) {
-    val t = tv[0]
-    val v = tv[1]
-    if ((halfWay / v) > t) {
-      halfWay -= v * t 
-      halfTime += t
-    } else {
-      halfTime += halfWay / v 
-      break
+    var halfWay = (t1 * v1 + t2 * v2 + t3 * v3) / 2
+    var halfTime = 0.0
+    for ((t, v) in listOf(t1 to v1, t2 to v2, t3 to v3)) {
+        if ((halfWay / v) > t) {
+            halfWay -= v * t
+            halfTime += t
+        } else {
+            halfTime += halfWay / v
+            break
+        }
     }
-  }
-  return halfTime
+    return halfTime
 }
 
 /**
@@ -126,17 +124,17 @@ fun whichRookThreatens(
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
 ): Int {
-  val firstRookThreatens = kingX == rookX1 || kingY == rookY1
-  val secondRookThreatens = kingX == rookX2 || kingY == rookY2
-  if (firstRookThreatens && secondRookThreatens) {
-    return 3
-  } else if (firstRookThreatens) {
-    return 1
-  } else if (secondRookThreatens) {
-    return 2
-  } else {
-    return 0
-  }
+    val firstRookThreatens = kingX == rookX1 || kingY == rookY1
+    val secondRookThreatens = kingX == rookX2 || kingY == rookY2
+    return if (firstRookThreatens && secondRookThreatens) {
+        3
+    } else if (firstRookThreatens) {
+        1
+    } else if (secondRookThreatens) {
+        2
+    } else {
+        0
+    }
 }
 
 /**
@@ -154,17 +152,17 @@ fun rookOrBishopThreatens(
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
 ): Int {
-  val rookThreatens = kingX == rookX || kingY == rookY
-  val bishopThreatens = abs(kingX - bishopX) == abs(kingY-bishopY)
-  if (rookThreatens && bishopThreatens) {
-    return 3
-   } else if (rookThreatens) {
-    return 1
-   } else if (bishopThreatens) {
-    return 2
-   } else {
-    return 0
-   }
+    val rookThreatens = kingX == rookX || kingY == rookY
+    val bishopThreatens = abs(kingX - bishopX) == abs(kingY - bishopY)
+    return if (rookThreatens && bishopThreatens) {
+        3
+    } else if (rookThreatens) {
+        1
+    } else if (bishopThreatens) {
+        2
+    } else {
+        0
+    }
 }
 
 /**
@@ -176,27 +174,27 @@ fun rookOrBishopThreatens(
  * Если такой треугольник не существует, вернуть -1.
  */
 fun triangleKind(a: Double, b: Double, c: Double): Int {
-  var arr = mutableListOf(a, b, c)
-  val max = arr.maxOrNull()!!
-  arr.remove(max)
-  val min = arr.minOrNull()!!
-  arr.remove(min)
-  val middle = arr[0]
+    val arr = mutableListOf(a, b, c)
+    val max = arr.maxOrNull()!!
+    arr.remove(max)
+    val min = arr.minOrNull()!!
+    arr.remove(min)
+    val middle = arr[0]
 
-  if (min + middle < max) {
-    return - 1
-  } else {
-    // Вычисляем косинус угла, лежащего напротив большей стороны
-    // по закону синусов
-    val cosA = (-(max*max) + min*min + middle*middle)/(2*middle*min)
-    val acosA = acos(cosA)
-    val ninetyRadians = PI / 2
-    when {
-      acosA < ninetyRadians -> return 0
-      acosA == ninetyRadians -> return 1
-      else -> return 2
+    return if (min + middle < max) {
+        -1
+    } else {
+        // Вычисляем косинус угла, лежащего напротив большей стороны
+        // по закону синусов
+        val cosA = (-(max * max) + min * min + middle * middle) / (2 * middle * min)
+        val acosA = acos(cosA)
+        val ninetyRadians = PI / 2
+        when {
+            acosA < ninetyRadians -> 0
+            acosA == ninetyRadians -> 1
+            else -> 2
+        }
     }
-  }
 }
 
 /**
@@ -208,11 +206,11 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
  * Если пересечения нет, вернуть -1.
  */
 
-fun segmentLength(a: Int, b: Int, c: Int, d: Int) : Int {
-  val length = (a..b).intersect(c..d).size
-  return if (length == 0) -1 else length - 1
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
+    val length = (a..b).intersect(c..d).size
+    return if (length == 0) -1 else length - 1
 }
 
 fun main() {
-  println(timeForHalfWay(1.0, 10.0, 2.0, 40.0, 3.0, 50.0))
+    println(timeForHalfWay(1.0, 10.0, 2.0, 40.0, 3.0, 50.0))
 }

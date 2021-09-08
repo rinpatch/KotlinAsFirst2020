@@ -78,9 +78,9 @@ fun circleInside(
  * Вернуть true, если кирпич пройдёт
  */
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
-  var brickSides = arrayOf(a, b, c)
-  var holeSides = arrayOf(r, s)
-  brickSides.sort()
-  holeSides.sort()
-  return (brickSides[0] <= holeSides[0] && brickSides[1] <= holeSides[1])
+    var brickSides = arrayOf(a, b, c)
+    var holeSides = arrayOf(r, s)
+    brickSides.sort()
+    holeSides.sort()
+    return (brickSides[0] <= holeSides[0] && brickSides[1] <= holeSides[1])
 }
