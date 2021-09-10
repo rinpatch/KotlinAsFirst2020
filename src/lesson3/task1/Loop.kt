@@ -338,7 +338,7 @@ fun sequenceDigit(n: Int, generator: (n: Int) -> Int) : Int {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int = sequenceDigit(n, {n: Int -> n*n})
+fun squareSequenceDigit(n: Int): Int = sequenceDigit(n, {x: Int -> x*x})
 
 /**
  * Сложная (5 баллов)
