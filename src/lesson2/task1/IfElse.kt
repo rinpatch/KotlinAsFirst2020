@@ -170,12 +170,9 @@ fun rookOrBishopThreatens(
  * Если такой треугольник не существует, вернуть -1.
  */
 fun triangleKind(a: Double, b: Double, c: Double): Int {
-    val arr = mutableListOf(a, b, c)
-    val max = arr.maxOrNull()!!
-    arr.remove(max)
-    val min = arr.minOrNull()!!
-    arr.remove(min)
-    val middle = arr[0]
+    val max = maxOf(a,b,c)
+    val min = minOf(a,b,c)
+    val middle = a + b + c - max - min
 
     return if (min + middle < max) {
         -1
