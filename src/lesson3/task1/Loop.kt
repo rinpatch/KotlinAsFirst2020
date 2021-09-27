@@ -264,16 +264,7 @@ fun hasDifferentDigits(n: Int): Boolean {
     return false
 }
 
-fun unbloatX(x: Double) : Double {
-    var shortX = x
-    while (shortX < 0) {
-        shortX = shortX + 2 * PI
-    }
-    while (shortX >= 2 * PI) {
-        shortX = shortX - 2 * PI
-    }
-    return shortX
-}
+fun unbloatX(x: Double) : Double = x % (PI * 2)
 
 fun countSinCosSeq(x: Double, eps: Double, numStart: Int) : Double {
     var result = 0.0
