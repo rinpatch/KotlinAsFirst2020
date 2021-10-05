@@ -333,7 +333,7 @@ fun sequenceDigit(n: Int, generator: (n: Int) -> Int) : Int {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int = sequenceDigit(n, {x: Int -> x*x})
+fun squareSequenceDigit(n: Int): Int = sequenceDigit(n) {it * it}
 
 /**
  * Сложная (5 баллов)
@@ -347,4 +347,4 @@ fun squareSequenceDigit(n: Int): Int = sequenceDigit(n, {x: Int -> x*x})
 fun fibSequenceDigit(n: Int): Int =
     // Calling fib over and over is not the most efficient,
     // but it's simpler and it's not like this is production code
-    sequenceDigit(n, {n: Int -> fib(n)})
+    sequenceDigit(n) {fib(it)}

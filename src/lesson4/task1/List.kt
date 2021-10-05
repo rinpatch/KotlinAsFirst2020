@@ -122,7 +122,7 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double = sqrt(v.sumOf({x: Double -> x*x}))
+fun abs(v: List<Double>): Double = sqrt(v.sumOf(){it * it})
 
 /**
  * Простая (2 балла)
@@ -154,7 +154,7 @@ fun center(list: MutableList<Double>): MutableList<Double> {
  * представленные в виде списков a и b. Скалярное произведение считать по формуле:
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.
  */
-fun times(a: List<Int>, b: List<Int>): Int = a.zip(b, {a: Int, b: Int -> a*b}).sum()
+fun times(a: List<Int>, b: List<Int>): Int = a.zip(b, {a, b -> a*b}).sum()
 
 /**
  * Средняя (3 балла)
@@ -165,7 +165,7 @@ fun times(a: List<Int>, b: List<Int>): Int = a.zip(b, {a: Int, b: Int -> a*b}).s
  * Значение пустого многочлена равно 0 при любом x.
  */
 fun polynom(p: List<Int>, x: Int): Int =
-    p.withIndex().sumOf({(index: Int, p: Int) -> p * x.toDouble().pow(index).toInt()})
+    p.withIndex().sumOf({(index, p) -> p * x.toDouble().pow(index).toInt()})
 
 /**
  * Средняя (3 балла)
@@ -268,7 +268,7 @@ fun convertCharToDigit(char: Char): Int =
 fun convertToString(n: Int, base: Int): String {
     val digitList = convert(n, base)
     return digitList.joinToString(separator = "",
-        transform = {digit: Int -> convertDigitToChar(digit).toString()})
+        transform = {digit -> convertDigitToChar(digit).toString()})
 }
 
 /**
