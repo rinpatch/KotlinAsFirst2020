@@ -239,7 +239,12 @@ fun revert(n: Int): Int {
 fun isPalindrome(n: Int): Boolean {
     val digitCount = digitNumber(n)
     if (digitCount == 1) return true
-    val leftSide = n / (10.0).pow(digitCount / 2 + digitCount % 2).toInt()
+    var leftSide = n / (10.0).pow(digitCount / 2 + digitCount % 2).toInt()
+    // Zeroes at the start of right side disappear when the number is reverted,
+    // so let's remove zeroes from the end of left side before comparing
+    while (leftSide % 10 == 0) {
+        leftSide /= 10
+    }
     val rightSide = n % (10.0).pow(digitCount / 2).toInt()
     return leftSide == revert(rightSide)
 }
