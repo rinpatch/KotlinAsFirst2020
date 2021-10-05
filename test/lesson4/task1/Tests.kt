@@ -183,6 +183,7 @@ class Tests {
     @Tag("3")
     fun convert() {
         assertEquals(listOf(1), convert(1, 2))
+        assertEquals(listOf(0), convert(0, 2))
         assertEquals(listOf(1, 2, 1, 0), convert(100, 4))
         assertEquals(listOf(1, 3, 12), convert(250, 14))
         assertEquals(listOf(2, 14, 12), convert(1000, 19))
@@ -192,6 +193,7 @@ class Tests {
     @Tag("4")
     fun convertToString() {
         assertEquals("1", convertToString(1, 2))
+        assertEquals("0", convertToString(0, 2))
         assertEquals("1210", convertToString(100, 4))
         assertEquals("13c", convertToString(250, 14))
         assertEquals("2ec", convertToString(1000, 19))
