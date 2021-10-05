@@ -187,7 +187,7 @@ fun isCoPrime(m: Int, n: Int): Boolean {
     // https://ru.wikipedia.org/wiki/%D0%90%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC_%D0%95%D0%B2%D0%BA%D0%BB%D0%B8%D0%B4%D0%B0#%D0%90%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC_%D0%95%D0%B2%D0%BA%D0%BB%D0%B8%D0%B4%D0%B0_%D0%B4%D0%BB%D1%8F_%D1%86%D0%B5%D0%BB%D1%8B%D1%85_%D1%87%D0%B8%D1%81%D0%B5%D0%BB
     val first = max(m,n)
     var previous = min(m, n)
-    if (first % previous == 0) return false
+    if ((first % previous == 0) && previous != 1) return false
     var remainder = first % previous
     while (remainder != 0) {
         if (previous % remainder == 0) {
