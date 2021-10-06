@@ -341,9 +341,13 @@ fun russian(n: Int): String {
     var result = mutableListOf<String>()
     for (thousands in listOf(true, false)) {
         val placesStart = if(thousands) 3 else 0
-        if (decimalPlaces[2 + placesStart]> 0) result.add(hundreds[decimalPlaces[2 + placesStart] - 1])
+        if (decimalPlaces[2 + placesStart] > 0) result.add(hundreds[decimalPlaces[2 + placesStart] - 1])
         if (decimalPlaces[1 + placesStart] == 1) {
-            result.add(teens[decimalPlaces[0 + placesStart] - 1])
+            if (decimalPlaces[0 + placesStart] == 0) {
+                result.add(tens[0])
+            } else {
+                result.add(teens[decimalPlaces[0 + placesStart] - 1])
+            }
         } else {
             if (decimalPlaces[1 + placesStart] > 0) result.add(tens[decimalPlaces[1 + placesStart] - 1])
             if (decimalPlaces[0 + placesStart] > 0 && !thousands) result.add(digits[decimalPlaces[0 + placesStart] - 1])
