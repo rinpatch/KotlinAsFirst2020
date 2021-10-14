@@ -191,7 +191,7 @@ fun isCoPrime(m: Int, n: Int): Boolean {
     while (remainder != 0) {
         if (previous % remainder == 0) {
             return remainder == 1
-            } else {
+        } else {
             val lastRemainder = remainder
             remainder = previous % remainder
             previous = lastRemainder
