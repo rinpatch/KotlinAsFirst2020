@@ -122,7 +122,7 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double = sqrt(v.sumOf(){it * it})
+fun abs(v: List<Double>): Double = sqrt(v.sumOf(){ it * it })
 
 /**
  * Простая (2 балла)
@@ -140,7 +140,7 @@ fun mean(list: List<Double>): Double = list.sum().toDouble() / (if (list.size !=
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun center(list: MutableList<Double>): MutableList<Double> {
-    val mean = list.sum() / list.size
+    val mean = mean(list)
     for ((index, element) in list.withIndex()) {
         list[index] = element - mean
     }
@@ -154,7 +154,7 @@ fun center(list: MutableList<Double>): MutableList<Double> {
  * представленные в виде списков a и b. Скалярное произведение считать по формуле:
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.
  */
-fun times(a: List<Int>, b: List<Int>): Int = a.zip(b, {a, b -> a*b}).sum()
+fun times(a: List<Int>, b: List<Int>): Int = a.zip(b, { a, b -> a*b }).sum()
 
 /**
  * Средняя (3 балла)
@@ -165,7 +165,7 @@ fun times(a: List<Int>, b: List<Int>): Int = a.zip(b, {a, b -> a*b}).sum()
  * Значение пустого многочлена равно 0 при любом x.
  */
 fun polynom(p: List<Int>, x: Int): Int =
-    p.withIndex().sumOf({(index, p) -> p * x.toDouble().pow(index).toInt()})
+    p.withIndex().sumOf({ (index, p) -> p * x.toDouble().pow(index).toInt() })
 
 /**
  * Средняя (3 балла)
@@ -269,7 +269,7 @@ fun convertCharToDigit(char: Char): Int =
 fun convertToString(n: Int, base: Int): String {
     val digitList = convert(n, base)
     return digitList.joinToString(separator = "",
-        transform = {digit -> convertDigitToChar(digit).toString()})
+        transform = { digit -> convertDigitToChar(digit).toString() })
 }
 
 /**
@@ -280,7 +280,7 @@ fun convertToString(n: Int, base: Int): String {
  * Например: digits = (1, 3, 12), base = 14 -> 250
  */
 fun decimal(digits: List<Int>, base: Int): Int =
-    digits.foldIndexed(0, {index, result, digit -> result + (digit * base.toDouble().pow(digits.size - index - 1).toInt())})
+    digits.foldIndexed(0, { index, result, digit -> result + (digit * base.toDouble().pow(digits.size - index - 1).toInt()) })
 
 /**
  * Сложная (4 балла)
@@ -295,7 +295,7 @@ fun decimal(digits: List<Int>, base: Int): Int =
  * (например, str.toInt(base)), запрещается.
  */
 fun decimalFromString(str: String, base: Int): Int =
-    decimal(str.flatMapTo(mutableListOf<Int>(), {char -> listOf(convertCharToDigit(char))}), base)
+    decimal(str.flatMapTo(mutableListOf<Int>(), { char -> listOf(convertCharToDigit(char)) }), base)
 
 /**
  * Сложная (5 баллов)
