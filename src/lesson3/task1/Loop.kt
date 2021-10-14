@@ -257,13 +257,15 @@ fun isPalindrome(n: Int): Boolean {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun hasDifferentDigits(n: Int): Boolean {
-    var lastDigit = - 1
-    for (i in digitNumber(n) downTo 1) {
-        val currentDigit = n % 10.0.pow(i).toInt() / 10.0.pow(i - 1).toInt()
+    var nLeft = n
+    var lastDigit = -1
+    while (nLeft != 0) {
+        val currentDigit = nLeft % 10
         when(lastDigit) {
             -1, currentDigit -> lastDigit = currentDigit
             else -> return true
         }
+        nLeft /= 10
     }
     return false
 }
