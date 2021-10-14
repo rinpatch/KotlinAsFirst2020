@@ -150,10 +150,9 @@ fun collatzSteps(x: Int): Int {
     var xW = x
     var steps = 0 
     while (xW != 1) {
-        if (xW % 2 == 0) {
-            xW = xW / 2
-        } else {
-            xW = 3 * xW + 1
+        xW = when {
+            xW % 2 == 0 -> xW / 2
+            else -> 3 * xW + 1
         }
         steps = steps + 1
     }
