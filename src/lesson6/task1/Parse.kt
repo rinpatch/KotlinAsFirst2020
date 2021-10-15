@@ -2,6 +2,10 @@
 
 package lesson6.task1
 
+import lesson2.task2.daysInMonth
+import kotlin.math.max
+import kotlin.math.floor
+
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
 // Рекомендуемое количество баллов = 11
@@ -63,6 +67,8 @@ fun main() {
 }
 
 
+val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря")
+
 /**
  * Средняя (4 балла)
  *
@@ -74,7 +80,18 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    val parsedStr = str.split(" ")
+    if (parsedStr.size != 3) return ""
+
+    val day = parsedStr[0].toIntOrNull()
+    val month = months.indexOf(parsedStr[1]) + 1
+    val year = parsedStr[2].toIntOrNull()
+    if (day == null || year == null || month == 0) return ""
+    if (day > daysInMonth(month, year)) return ""
+
+    return String.format("%02d.%02d.%d", day, month, year)
+}
 
 /**
  * Средняя (4 балла)
@@ -86,7 +103,18 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    val parsedStr = digital.split(".").map { it.toIntOrNull() }
+    if(parsedStr.size != 3) return ""
+
+    val day = parsedStr[0]
+    val monthNumber = parsedStr[1]
+    val year = parsedStr[2]
+    if (day == null || year == null || monthNumber == null || monthNumber !in 1..months.size) return ""
+    if(day > daysInMonth(monthNumber, year)) return ""
+
+    return "$day ${months[monthNumber - 1]} $year"
+} 
 
 /**
  * Средняя (4 балла)
@@ -114,8 +142,16 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
-
+fun bestLongJump(jumps: String): Int {
+    var result = -1
+    for(jump in jumps.split(" ")) {
+        when {
+            jump.toIntOrNull() != null -> result = max(result, jump.toIntOrNull()!!)
+            jump != "-" && jump != "%" -> return -1
+        }
+    }
+    return result
+}
 /**
  * Сложная (6 баллов)
  *
@@ -127,7 +163,19 @@ fun bestLongJump(jumps: String): Int = TODO()
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    var maxHeight = -1
+    for(jump in jumps.split(" ").chunked(2)) {
+        if (jump.size != 2) return -1
+        val height = jump[0].toIntOrNull() ?: return -1
+        if (jump[1].indexOf('+') != -1) maxHeight = max(maxHeight, height)
+    }
+    return maxHeight
+}
+
+fun toIntOrNullWithoutSigns(i: String) : Int? =
+    if(i.startsWith('+') || i.startsWith('-')) null
+    else i.toIntOrNull()
 
 /**
  * Сложная (6 баллов)
@@ -138,7 +186,21 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    val tmp = expression.split(" ", limit = 2)
+    var result = toIntOrNullWithoutSigns(tmp[0]) ?: throw IllegalArgumentException("Operand expected")
+    if (tmp.size == 1) return result
+    for (singleOperation in tmp[1].split(" ").chunked(2)) {
+        if (singleOperation.size != 2) throw IllegalArgumentException("Operand expected")
+        val number = toIntOrNullWithoutSigns(singleOperation[1]) ?: throw IllegalArgumentException("Operand expected")
+        when (singleOperation[0]) {
+            "+" -> result += number
+            "-" -> result -= number
+            else -> throw IllegalArgumentException("Illegal operand: ${singleOperation[0]}")
+        }
+    }
+    return result
+}
 
 /**
  * Сложная (6 баллов)
@@ -149,7 +211,14 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String): Int {
+    val chunked = str.lowercase().split(" ").chunked(2)
+    val wordIndex =
+        chunked
+        .indexOfFirst({words -> if(words.size == 2) words[0] == words[1] else false})
+    return if (wordIndex == -1) -1
+    else chunked.slice(0 until wordIndex).flatten().sumBy({ it.length + 1 })
+}
 
 /**
  * Сложная (6 баллов)
@@ -213,4 +282,56 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    val commandList = commands.toList()
+    var commandPosition = 0
+    var commandsLeft = limit
+    val stack = mutableListOf<Int>()
+
+    val cellList = MutableList(cells) { 0 }
+    var cellPosition = floor(cells / 2.0).toInt()
+
+    // First, check for illegal/unmatched commands
+    var unmatchedOpeningBrackets = 0
+    for ((position, command) in commandList.withIndex()) {
+        when (command) {
+            !in listOf('+', '-', '<', '>', '[', ']', ' ') -> throw IllegalArgumentException("Illegal command at position $position: $command")
+            '[' -> unmatchedOpeningBrackets += 1
+            ']' -> {
+                unmatchedOpeningBrackets -= 1
+                if (unmatchedOpeningBrackets < 0) {
+                    throw IllegalArgumentException("] found before [ at positon $position")
+                }
+            }
+        }
+    }
+    if (unmatchedOpeningBrackets != 0) throw IllegalArgumentException("Unmatched [ found")
+
+    // Then, execute the commands
+    while (commandsLeft != 0 && commandPosition != commandList.size) {
+        when (commandList[commandPosition]) {
+            '+' ->  cellList[cellPosition] += 1
+            '-' -> cellList[cellPosition] -= 1
+            '>' -> {
+                cellPosition += 1
+                if (cellPosition == cellList.size) throw IllegalStateException("> at position $commandPosition tried to move past cell list bounds")
+            }
+            '<' -> {
+                cellPosition -= 1
+                if (cellPosition == -1) throw IllegalStateException("< at position $commandPosition tried to move past cell list bounds")
+            }
+            '[' -> {
+                if (cellList[cellPosition] == 0) while(commandList[commandPosition] != ']') commandPosition += 1
+                else stack.add(commandPosition)
+            }
+            ']' -> {
+                val returnTo = stack.last()
+                if (cellList[cellPosition] != 0) commandPosition = returnTo
+                else stack.removeLast()
+            }
+    }
+    commandsLeft -= 1
+    commandPosition += 1
+  }
+  return cellList
+}
