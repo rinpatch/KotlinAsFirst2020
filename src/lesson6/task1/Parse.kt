@@ -212,12 +212,12 @@ fun plusMinus(expression: String): Int {
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
 fun firstDuplicateIndex(str: String): Int {
-    val chunked = str.lowercase().split(" ").chunked(2)
-    val wordIndex =
-        chunked
-        .indexOfFirst({words -> if(words.size == 2) words[0] == words[1] else false})
-    return if (wordIndex == -1) -1
-    else chunked.slice(0 until wordIndex).flatten().sumBy({ it.length + 1 })
+    val words = str.lowercase().split(" ")
+    for (i in 0..(words.lastIndex-1)) {
+        if (words[i] == words[i+1])
+            return words.slice(0 until i).sumBy({ it.length + 1})
+    }
+    return -1
 }
 
 /**
