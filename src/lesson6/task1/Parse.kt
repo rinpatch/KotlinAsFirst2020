@@ -321,7 +321,16 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
                 if (cellPosition == -1) throw IllegalStateException("< at position $commandPosition tried to move past cell list bounds")
             }
             '[' -> {
-                if (cellList[cellPosition] == 0) while(commandList[commandPosition] != ']') commandPosition += 1
+                if (cellList[cellPosition] == 0) {
+                    var nestedBrackets = 1
+                    while(nestedBrackets != 0) {
+                        commandPosition += 1
+                        when (commandList[commandPosition]) {
+                            '[' -> nestedBrackets += 1
+                            ']' -> nestedBrackets -= 1
+                        }
+                    }
+                }
                 else stack.add(commandPosition)
             }
             ']' -> {

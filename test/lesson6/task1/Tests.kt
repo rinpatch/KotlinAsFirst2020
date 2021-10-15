@@ -132,6 +132,7 @@ class Tests {
     @Tag("7")
     fun computeDeviceCells() {
         assertEquals(listOf(0, 0, 0, 0, 0, 1, 1, 1, 1, 1), computeDeviceCells(10, "+>+>+>+>+", 10000))
+        assertEquals(listOf(0), computeDeviceCells(1, "[[[]]]", 10000))
         assertEquals(listOf(-1, -1, -1, -1, -1, 0, 0, 0, 0, 0), computeDeviceCells(10, "<-<-<-<-<-", 10000))
         assertEquals(listOf(1, 1, 1, 1, 1, 0, 0, 0, 0, 0), computeDeviceCells(10, "- <<<<< +[>+]", 10000))
         assertEquals(
