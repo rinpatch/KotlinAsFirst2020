@@ -84,9 +84,11 @@ fun deleteMarked(inputName: String, outputName: String) {
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
     val result = substrings.associate({ it to 0 }).toMutableMap()
+    val distrinctSubstrings = substrings.distinct()
+
     File(inputName).forEachLine { line ->
         val normalizedLine = line.lowercase()
-        for (substring in substrings) {
+        for (substring in distrinctSubstrings) {
             val normalizedSubstring = substring.lowercase()
             var startIndex = 0
             while (startIndex != normalizedLine.lastIndex) {
