@@ -196,7 +196,7 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
         priceList.add(price)
         priceMap[ticker] = priceList
     }
-    return priceMap.mapValues({(ticker, priceList) -> mean(priceList)})
+    return priceMap.mapValues({(_, priceList) -> mean(priceList)})
 }
 
 /**

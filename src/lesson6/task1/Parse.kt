@@ -215,7 +215,7 @@ fun firstDuplicateIndex(str: String): Int {
     val words = str.lowercase().split(" ")
     for (i in 0..(words.lastIndex-1)) {
         if (words[i] == words[i+1])
-            return words.slice(0 until i).sumBy({ it.length + 1})
+            return words.slice(0 until i).sumOf({ it.length + 1})
     }
     return -1
 }
