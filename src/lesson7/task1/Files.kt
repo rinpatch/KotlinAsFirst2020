@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import kotlin.text.RegexOption.IGNORE_CASE
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -121,7 +122,30 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    TODO()
+     val regex = Regex("(ж|ш|ч|щ)(ы|ю|я)", IGNORE_CASE)
+     File(outputName).bufferedWriter().use() { writer ->
+        File(inputName).forEachLine { line ->
+                var modifiedLine =
+                    line.replace(regex)
+                    { match ->
+                        val (consonant, vowel) = match.destructured
+                        val newVowel =
+                            when (vowel) {
+                                "ы" -> "и"
+                                "Ы" -> "И"
+                                "я" -> "а"
+                                "Я" -> "А"
+                                "ю" -> "у"
+                                "Ю" -> "У"
+                                else -> vowel
+                           }
+                       consonant + newVowel
+                    }
+
+                writer.write(modifiedLine)
+                writer.newLine()
+        }
+    }
 }
 
 /**
