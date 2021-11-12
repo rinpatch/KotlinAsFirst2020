@@ -297,20 +297,13 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
-    val commandList = commands.toList()
-    var commandPosition = 0
-    var commandsLeft = limit
-    val stack = mutableListOf<Int>()
 
-    val cellList = MutableList(cells) { 0 }
-    var cellPosition = floor(cells / 2.0).toInt()
-
-    // First, check for illegal/unmatched commands
+val validCommands = setOf('+', '-', '<', '>', '[', ']', ' ')
+fun validateCommands(commands: List<Char>): Unit {
     var unmatchedOpeningBrackets = 0
-    for ((position, command) in commandList.withIndex()) {
+    for ((position, command) in commands.withIndex()) {
         when (command) {
-            !in listOf('+', '-', '<', '>', '[', ']', ' ') -> throw IllegalArgumentException("Illegal command at position $position: $command")
+            !in validCommands -> throw IllegalArgumentException("Illegal command at position $position: $command")
             '[' -> unmatchedOpeningBrackets += 1
             ']' -> {
                 unmatchedOpeningBrackets -= 1
@@ -321,8 +314,19 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
         }
     }
     if (unmatchedOpeningBrackets != 0) throw IllegalArgumentException("Unmatched [ found")
+}
 
-    // Then, execute the commands
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    val commandList = commands.toList()
+    var commandPosition = 0
+    var commandsLeft = limit
+    val stack = ArrayDeque<Int>()
+
+    val cellList = MutableList(cells) { 0 }
+    var cellPosition = cells / 2
+
+    validateCommands(commandList)
+
     while (commandsLeft != 0 && commandPosition != commandList.size) {
         when (commandList[commandPosition]) {
             '+' ->  cellList[cellPosition] += 1
