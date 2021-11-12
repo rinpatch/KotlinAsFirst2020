@@ -67,7 +67,18 @@ fun main() {
 }
 
 
-val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря")
+val months = listOf("января",
+                    "февраля",
+                    "марта",
+                    "апреля",
+                    "мая",
+                    "июня",
+                    "июля",
+                    "августа",
+                    "сентября",
+                    "октября",
+                    "ноября",
+                    "декабря")
 
 /**
  * Средняя (4 балла)
@@ -88,7 +99,7 @@ fun dateStrToDigit(str: String): String {
     val month = months.indexOf(parsedStr[1]) + 1
     val year = parsedStr[2].toIntOrNull()
     if (day == null || year == null || month == 0) return ""
-    if (day > daysInMonth(month, year)) return ""
+    if (year < 0 || day < 1 || day > daysInMonth(month, year)) return ""
 
     return String.format("%02d.%02d.%d", day, month, year)
 }
@@ -107,11 +118,9 @@ fun dateDigitToStr(digital: String): String {
     val parsedStr = digital.split(".").map { it.toIntOrNull() }
     if(parsedStr.size != 3) return ""
 
-    val day = parsedStr[0]
-    val monthNumber = parsedStr[1]
-    val year = parsedStr[2]
+    val (day, monthNumber, year) = parsedStr
     if (day == null || year == null || monthNumber == null || monthNumber !in 1..months.size) return ""
-    if(day > daysInMonth(monthNumber, year)) return ""
+    if(year < 0 || day < 1 || day > daysInMonth(monthNumber, year)) return ""
 
     return "$day ${months[monthNumber - 1]} $year"
 } 
