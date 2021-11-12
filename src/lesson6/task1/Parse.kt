@@ -172,12 +172,18 @@ fun bestLongJump(jumps: String): Int {
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
+
+val attemptTypes = setOf('%', '+', '-')
 fun bestHighJump(jumps: String): Int {
     var maxHeight = -1
     for(jump in jumps.split(" ").chunked(2)) {
         if (jump.size != 2) return -1
         val height = jump[0].toIntOrNull() ?: return -1
-        if (jump[1].indexOf('+') != -1) maxHeight = max(maxHeight, height)
+        val attempts = jump[1].toSet()
+        when {
+            !(attempts.subtract(attemptTypes).isEmpty()) -> return -1
+            attempts.contains('+') -> maxHeight = max(maxHeight, height)
+        }
     }
     return maxHeight
 }
