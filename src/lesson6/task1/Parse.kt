@@ -155,7 +155,7 @@ fun bestLongJump(jumps: String): Int {
     var result = -1
     for(jump in jumps.split(" ")) {
         when {
-            jump.toIntOrNull() != null -> result = max(result, jump.toIntOrNull()!!)
+            jump.toIntOrNull() != null -> result = max(result, jump.toInt())
             jump != "-" && jump != "%" -> return -1
         }
     }
