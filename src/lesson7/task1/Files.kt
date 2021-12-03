@@ -477,8 +477,50 @@ fun markdownToHtml(inputName: String, outputName: String) {
  2350
  *
  */
+
+fun toDigitList(number: Int): List<Int> {
+    if (number == 0) return listOf(0)
+    val result = mutableListOf<Int>()
+    var remainder = number
+    while (remainder > 0) {
+        result.add(remainder % 10)
+        remainder = remainder / 10
+    }
+    return result
+}
+
+fun padUntil (width: Int, content: Int, leaveChars: Int) : String {
+    val offset = width - "$content".length - leaveChars
+    return " ".repeat(offset) + "$content"
+}
+
 fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+    val result = " ${lhv*rhv}"
+    val width = result.length
+
+     File(outputName).bufferedWriter().use() { writer ->
+        writer.write(padUntil(width, lhv, 0))
+        writer.newLine()
+
+        writer.write("*" + padUntil(width-1, rhv, 0))
+        writer.newLine()
+
+        writer.write("-".repeat(width))
+        writer.newLine()
+
+        val digits = toDigitList(rhv)
+        for ((index, digit) in digits.withIndex()) {
+            val line = 
+                if (index == 0) padUntil(width, lhv * digit, index)
+                else "+" + padUntil(width-1, lhv*digit, index)
+            writer.write(line)
+            writer.newLine()
+        }
+
+        writer.write("-".repeat(width))
+        writer.newLine()
+        writer.write(result)
+     }
 }
 
 
@@ -502,17 +544,6 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
-
-fun toDigitList(number: Int): List<Int> {
-    if (number == 0) return listOf(0)
-    val result = mutableListOf<Int>()
-    var remainder = number
-    while (remainder > 0) {
-        result.add(remainder % 10)
-        remainder = remainder / 10
-    }
-    return result
-}
 
 fun pad(length: Int) : String = " ".repeat(length)
 
