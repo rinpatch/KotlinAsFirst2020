@@ -4,7 +4,8 @@ package lesson7.task1
 
 import java.io.File
 import kotlin.text.RegexOption.IGNORE_CASE
-
+import kotlin.math.pow
+import lesson3.task1.digitNumber
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
 // Максимальное количество баллов = 55
@@ -501,7 +502,77 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
+
+fun toDigitList(number: Int): List<Int> {
+    if (number == 0) return listOf(0)
+    val result = mutableListOf<Int>()
+    var remainder = number
+    while (remainder > 0) {
+        result.add(remainder % 10)
+        remainder = remainder / 10
+    }
+    return result.reversed()
+}
+
+fun splitNumber(number: Int, headSize: Int) : Pair<Int, Int> {
+    val base = (10.0).pow(digitNumber(number) - headSize).toInt()
+    return (number / base) to (number % base)
+}
+
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+     File(outputName).bufferedWriter().use() { writer ->
+        val quotinent = lhv / rhv
+        var leftToDivide = lhv
+        val multipliers = toDigitList(quotinent)
+        val headerPart = " $lhv | "
+        val qPos = headerPart.length
+        writer.write("$headerPart$rhv")
+        writer.newLine()
+
+        var subtractFrom = 0
+        // Hack to make pad and subtractPad calculation correct with results such as "09". I hate it.
+        var subtractFromLen = 0
+        if (leftToDivide < rhv) {
+            subtractFrom = leftToDivide
+            leftToDivide = 0
+        } else {
+            while (subtractFrom < multipliers[0] * rhv) {
+              val (head, tail) = splitNumber(leftToDivide, 1)
+              subtractFrom = subtractFrom * 10 + head
+              leftToDivide = tail
+            }
+        }
+        subtractFromLen = digitNumber(subtractFrom)
+
+        var pad = ""
+
+        for ((index, multiplier) in multipliers.withIndex()) {
+            val subtract = multiplier * rhv
+            val subtractPad = pad + " ".repeat(subtractFromLen - digitNumber(subtract))
+            val subtractStr = "-$subtract"
+            if (index == 0) writer.write(subtractPad + subtractStr + " ".repeat(qPos - subtractStr.length) + quotinent)
+            else writer.write(subtractPad + subtractStr)
+            writer.newLine()
+
+            writer.write(subtractPad + "-".repeat(subtractStr.length))
+            writer.newLine()
+
+            pad = pad + " ".repeat(subtractFromLen - digitNumber(subtractFrom - subtract))
+
+            val (head, tail) = splitNumber(leftToDivide, 1)
+            subtractFrom = subtractFrom - subtract
+            subtractFromLen = digitNumber(subtractFrom)
+            writer.write(pad + " $subtractFrom")
+
+            if(index != multipliers.lastIndex) {
+                writer.write("$head")
+                subtractFrom = subtractFrom * 10 + head
+                subtractFromLen += 1
+            }
+
+            leftToDivide = tail
+            writer.newLine()
+        }
+     }
 }
 
