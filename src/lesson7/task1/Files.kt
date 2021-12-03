@@ -553,17 +553,22 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 
      var tmpRemainder = remainder
      val intermediateSteps = mutableListOf<Triple<String,String, Int>>()
-     for (digit in toDigitList(quotient)) {
+     val digitList = toDigitList(quotient)
+     for ((index, digit) in digitList.withIndex()) {
         val subtractor = rhv*digit
         val increasedRemainder = tmpRemainder + subtractor 
-        // If the last remainder was 0 and we add a 9 to it. It should be "09", not just "9"
-        val remainderStr = "${increasedRemainder / 10}" + "${increasedRemainder % 10}"
         val subtractorStr = "-$subtractor"
+
+        // A hack because subtractorPadLen is generated based on this value and will break when you divide, say 2/20
+        // since it would be written as "02" here, but it's actually not since 2 is lhv.
+        val remainderStr = if (index == digitList.lastIndex) "$increasedRemainder"
+                          // If the last remainder was 0 and we add a 9 to it. It should be "09", not just "9"
+                          else "${increasedRemainder / 10}" + "${increasedRemainder % 10}"
+
         intermediateSteps.add(Triple(subtractorStr, remainderStr, digitNumber(increasedRemainder - subtractor)))
         tmpRemainder = increasedRemainder / 10
      }
 
-     println(intermediateSteps)
      File(outputName).bufferedWriter().use() { writer ->
         val header = " $lhv | "
         val qPos = header.length
@@ -580,8 +585,8 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                 writer.newLine()
                 writer.write(pad(subtractorPadLen) + subtractor)
             } else {
-                subtractorPadLen = 0
-                writer.write(subtractor + " ".repeat(qPos - subtractor.length) + quotient)
+                subtractorPadLen += 1
+                writer.write(pad(subtractorPadLen) + subtractor + " ".repeat(qPos - subtractor.length) + quotient)
             }
             writer.newLine()
 
