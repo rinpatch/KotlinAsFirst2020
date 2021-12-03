@@ -554,8 +554,13 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             }
             writer.newLine()
 
-            writer.write(pad(subtractorPadLen) + "-".repeat(subtractor.length))
+            if (subtractor.length > subtractingFrom.length) {
+                writer.write(pad(subtractorPadLen) + "-".repeat(subtractor.length))
+            } else {
+                writer.write(pad(padLen) + "-".repeat(subtractingFrom.length))
+            }
             writer.newLine()
+
             padLen = subtractorPadLen + subtractor.length - resultLen
         }
       writer.write(pad(padLen) + "$remainder")
