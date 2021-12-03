@@ -5,6 +5,7 @@ package lesson7.task1
 import java.io.File
 import kotlin.text.RegexOption.IGNORE_CASE
 import kotlin.math.pow
+import kotlin.math.max
 import lesson3.task1.digitNumber
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -570,11 +571,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
      }
 
      File(outputName).bufferedWriter().use() { writer ->
-        val header = " $lhv | "
-        val qPos = header.length
-        writer.write("$header$rhv")
-        writer.newLine()
-
+        var qPos = 0
         var padLen = 0
         for ((index, intermediateSteps) in intermediateSteps.reversed().withIndex()) {
             val (subtractor, subtractingFrom, resultLen) = intermediateSteps
@@ -585,8 +582,13 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                 writer.newLine()
                 writer.write(pad(subtractorPadLen) + subtractor)
             } else {
-                subtractorPadLen += 1
-                writer.write(pad(subtractorPadLen) + subtractor + " ".repeat(qPos - subtractor.length) + quotient)
+                val header = if (subtractorPadLen == -1) " $lhv | "
+                             else "$lhv | "
+                subtractorPadLen = max(subtractorPadLen, 0)
+                qPos = header.length
+                writer.write("$header$rhv")
+                writer.newLine()
+                writer.write(pad(subtractorPadLen) + subtractor + " ".repeat(qPos - subtractor.length - subtractorPadLen) + quotient)
             }
             writer.newLine()
 
