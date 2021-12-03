@@ -324,7 +324,6 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
 
     val cellList = MutableList(cells) { 0 }
     var cellPosition = cells / 2
-    val loopCache = mutableMapOf<Int, Int>()
 
     validateCommands(commandList)
 
@@ -343,20 +342,13 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
             '[' -> {
                 if (cellList[cellPosition] == 0) {
                     var nestedBrackets = 1
-                    when (val loopEnd = loopCache[cellPosition]) {
-                        null -> {
-                            val loopStart = commandPosition
-                            while(nestedBrackets != 0) {
-                                commandPosition += 1
-                                when (commandList[commandPosition]) {
-                                    '[' -> nestedBrackets += 1
-                                    ']' -> nestedBrackets -= 1
-                                }
-                            }
-                            loopCache[loopStart] = commandPosition
+                    while(nestedBrackets != 0) {
+                        commandPosition += 1
+                        when (commandList[commandPosition]) {
+                            '[' -> nestedBrackets += 1
+                            ']' -> nestedBrackets -= 1
                         }
-                        else -> cellPosition = loopEnd
-                  }
+                    }
                 }
                 else stack.add(commandPosition)
             }
