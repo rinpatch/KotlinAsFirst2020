@@ -511,68 +511,54 @@ fun toDigitList(number: Int): List<Int> {
         result.add(remainder % 10)
         remainder = remainder / 10
     }
-    return result.reversed()
+    return result
 }
 
-fun splitNumber(number: Int, headSize: Int) : Pair<Int, Int> {
-    val base = (10.0).pow(digitNumber(number) - headSize).toInt()
-    return (number / base) to (number % base)
-}
+fun pad(length: Int) : String = " ".repeat(length)
 
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
+     val quotient = lhv / rhv
+     val remainder = lhv % rhv
+
+     var tmpRemainder = remainder
+     val intermediateSteps = mutableListOf<Triple<String,String, Int>>()
+     for (digit in toDigitList(quotient)) {
+        val subtractor = rhv*digit
+        val increasedRemainder = tmpRemainder + subtractor 
+        // If the last remainder was 0 and we add a 9 to it. It should be "09", not just "9"
+        val remainderStr = "${increasedRemainder / 10}" + "${increasedRemainder % 10}"
+        val subtractorStr = "-$subtractor"
+        intermediateSteps.add(Triple(subtractorStr, remainderStr, digitNumber(increasedRemainder - subtractor)))
+        tmpRemainder = increasedRemainder / 10
+     }
+
+     println(intermediateSteps)
      File(outputName).bufferedWriter().use() { writer ->
-        val quotinent = lhv / rhv
-        var leftToDivide = lhv
-        val multipliers = toDigitList(quotinent)
-        val headerPart = " $lhv | "
-        val qPos = headerPart.length
-        writer.write("$headerPart$rhv")
+        val header = " $lhv | "
+        val qPos = header.length
+        writer.write("$header$rhv")
         writer.newLine()
 
-        var subtractFrom = 0
-        // Hack to make pad and subtractPad calculation correct with results such as "09". I hate it.
-        var subtractFromLen = 0
-        if (leftToDivide < rhv) {
-            subtractFrom = leftToDivide
-            leftToDivide = 0
-        } else {
-            while (subtractFrom < multipliers[0] * rhv) {
-              val (head, tail) = splitNumber(leftToDivide, 1)
-              subtractFrom = subtractFrom * 10 + head
-              leftToDivide = tail
+        var padLen = 0
+        for ((index, intermediateSteps) in intermediateSteps.reversed().withIndex()) {
+            val (subtractor, subtractingFrom, resultLen) = intermediateSteps
+
+            var subtractorPadLen = padLen + subtractingFrom.length - subtractor.length
+            if (index != 0) {
+                writer.write(pad(padLen) + subtractingFrom)
+                writer.newLine()
+                writer.write(pad(subtractorPadLen) + subtractor)
+            } else {
+                subtractorPadLen = 0
+                writer.write(subtractor + " ".repeat(qPos - subtractor.length) + quotient)
             }
+            writer.newLine()
+
+            writer.write(pad(subtractorPadLen) + "-".repeat(subtractor.length))
+            writer.newLine()
+            padLen = subtractorPadLen + subtractor.length - resultLen
         }
-        subtractFromLen = digitNumber(subtractFrom)
-
-        var pad = ""
-
-        for ((index, multiplier) in multipliers.withIndex()) {
-            val subtract = multiplier * rhv
-            val subtractPad = pad + " ".repeat(subtractFromLen - digitNumber(subtract))
-            val subtractStr = "-$subtract"
-            if (index == 0) writer.write(subtractPad + subtractStr + " ".repeat(qPos - subtractStr.length) + quotinent)
-            else writer.write(subtractPad + subtractStr)
-            writer.newLine()
-
-            writer.write(subtractPad + "-".repeat(subtractStr.length))
-            writer.newLine()
-
-            pad = pad + " ".repeat(subtractFromLen - digitNumber(subtractFrom - subtract))
-
-            val (head, tail) = splitNumber(leftToDivide, 1)
-            subtractFrom = subtractFrom - subtract
-            subtractFromLen = digitNumber(subtractFrom)
-            writer.write(pad + " $subtractFrom")
-
-            if(index != multipliers.lastIndex) {
-                writer.write("$head")
-                subtractFrom = subtractFrom * 10 + head
-                subtractFromLen += 1
-            }
-
-            leftToDivide = tail
-            writer.newLine()
-        }
+      writer.write(pad(padLen) + "$remainder")
      }
 }
 
