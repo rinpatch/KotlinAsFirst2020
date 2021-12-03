@@ -219,7 +219,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
     stuff.forEach {(name, value) ->
         val currentKind = value.first
         val currentPrice = value.second
-        if (currentKind == kind && currentPrice < minPrice) {
+        if (currentKind == kind && currentPrice <= minPrice) {
             minPrice = currentPrice
             result = name
         }
