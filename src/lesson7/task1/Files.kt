@@ -336,8 +336,69 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
+
+enum class Style {
+    PARAGRAPH, STRIKEOUT, BOLD, ITALICS
+}
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+        File(outputName).bufferedWriter().use() { writer ->
+            writer.write("<html><body><p>")
+            val stack = ArrayDeque<Style>()
+            stack.add(Style.PARAGRAPH)
+            File(inputName).forEachLine { line ->
+                if (line.trim() == "" && !stack.isEmpty()) {
+                    // According to https://babelmark.github.io, most markdown
+                    // parcers do NOT allow styles that open in one paragraph and end
+                    // in another, instead dropping the style if not closed.
+                    while (stack.last() != Style.PARAGRAPH) stack.removeLast()
+                    stack.removeLast()
+                    writer.write("</p>")
+                } else {
+                    if (stack.isEmpty()) {
+                        stack.add(Style.PARAGRAPH)
+                        writer.write("<p>")
+                    }
+                    val handle =
+                        {lookFor: Style, tag: String ->
+                            if(stack.last() == lookFor) {
+                                stack.removeLast()
+                                writer.write("</$tag>")
+                            } else {
+                                stack.add(lookFor)
+                                writer.write("<$tag>")
+                            }
+                        }
+                    var i = 0
+                    while(i <= line.lastIndex) {
+                        when(line[i]) {
+                            '~' -> if (line[i+1] == '~') {
+                                    handle(Style.STRIKEOUT, "s")
+                                    i = i + 2
+                                   }
+                            '*' ->
+                                if(line[i+1] == '*' && line[i+2] == '*') {
+                                    handle(Style.BOLD, "b")
+                                    handle(Style.ITALICS, "i")
+                                    i = i + 3
+                                } else if(line[i+1] == '*'){
+                                    handle(Style.BOLD, "b")
+                                    i = i + 2
+                                } else {
+                                    handle(Style.ITALICS, "i")
+                                    i = i + 1
+                                }
+                           else -> {
+                             writer.write(line[i].toString())
+                             i = i + 1
+                           }
+                    }
+                }
+            }
+            writer.newLine()
+        }
+        if (!stack.isEmpty() && stack.last() == Style.PARAGRAPH) writer.write("</p>")
+        writer.write("</body></html>")
+    }
 }
 
 /**
