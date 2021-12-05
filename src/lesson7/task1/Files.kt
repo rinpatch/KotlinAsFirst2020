@@ -340,19 +340,26 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
 enum class Style {
     PARAGRAPH, STRIKEOUT, BOLD, ITALICS
 }
+
+fun lookAhead(line: String, index: Int): Char? =
+    if (index > line.lastIndex) null
+    else line[index]
+
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
         File(outputName).bufferedWriter().use() { writer ->
             writer.write("<html><body><p>")
             val stack = ArrayDeque<Style>()
             stack.add(Style.PARAGRAPH)
             File(inputName).forEachLine { line ->
-                if (line.trim() == "" && !stack.isEmpty()) {
-                    // According to https://babelmark.github.io, most markdown
-                    // parcers do NOT allow styles that open in one paragraph and end
-                    // in another, instead dropping the style if not closed.
-                    while (stack.last() != Style.PARAGRAPH) stack.removeLast()
-                    stack.removeLast()
-                    writer.write("</p>")
+                if (line.trim() == "") {
+                    if (!stack.isEmpty()) {
+                        // According to https://babelmark.github.io, most markdown
+                        // parcers do NOT allow styles that open in one paragraph and end
+                        // in another, instead dropping the style if not closed.
+                        while (stack.last() != Style.PARAGRAPH) stack.removeLast()
+                        stack.removeLast()
+                        writer.write("</p>")
+                    }
                 } else {
                     if (stack.isEmpty()) {
                         stack.add(Style.PARAGRAPH)
@@ -371,16 +378,16 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                     var i = 0
                     while(i <= line.lastIndex) {
                         when(line[i]) {
-                            '~' -> if (line[i+1] == '~') {
+                            '~' -> if (lookAhead(line, i + 1) == '~') {
                                     handle(Style.STRIKEOUT, "s")
                                     i = i + 2
                                    }
                             '*' ->
-                                if(line[i+1] == '*' && line[i+2] == '*') {
+                                if(lookAhead(line, i + 1)  == '*' && lookAhead(line, i + 2) == '*') {
                                     handle(Style.BOLD, "b")
                                     handle(Style.ITALICS, "i")
                                     i = i + 3
-                                } else if(line[i+1] == '*'){
+                                } else if(lookAhead(line, i+1) == '*'){
                                     handle(Style.BOLD, "b")
                                     i = i + 2
                                 } else {
