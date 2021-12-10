@@ -340,62 +340,55 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
 
 // This is a list because order of checking matters. Bold+italics should be checked before bold or italics.
 val replacements = listOf("***" to listOf("b", "i"), "**" to listOf("b"), "*" to listOf("i"), "~~" to listOf("s"))
+val paragraphRegex = "(\\n\\s?\\n)(.)".toRegex()
 
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-        val text = File(inputName).readText()
-        val paragraphs = text.split("\n\n")
+        val text = File(inputName)
+                   .readText()
+                   .replace(paragraphRegex)
+                   { match ->
+                     val (_, wordAfter) = match.destructured
+                     "</p><p>" + wordAfter
+                   }
         val stack = mutableListOf<String>()
 
         File(outputName).bufferedWriter().use() { writer ->
-            writer.write("<html><body>")
-            // This stupid task mentions NOTHING about preserving styles between paragraphs
-            // NO mainstream Markdown parsers actually do this https://babelmark.github.io/?text=*te%0A%0Ast*
-            // Yet if you copy that behavior you will fail a test in kotoed with GARBAGE RANDOMLY GENERATED DATA
-            // That you have to sift through for 10 minutes to figure out what the issue is.
-            // So yeah, anyway, that's why this hack is here.
-            var paragraphStartInText = 0
-            for (paragraph in paragraphs) {
-                if(paragraph.trim(' ', '\n') == "") continue
-                writer.write("<p>")
-                var index = 0
-                while(index <= paragraph.lastIndex) {
-                    var replaced = false
-                    for((replacement, tags) in replacements) {
-                        if(paragraph.startsWith(replacement, index)) {
-                            // Sort so we can handle stuff like "* text ** text***".
-                            if(stack.size >= tags.size && stack.takeLast(tags.size).sorted() == tags.sorted()) {
-                                val orderedTags = stack.takeLast(tags.size).reversed()
-                                for(tag in orderedTags) {
-                                  stack.removeLast()
-                                  writer.write("</$tag>")
-                                }
-                            } else {
-                                val closingIdx =
-                                    if(index != paragraph.lastIndex)
-                                        text.indexOf(replacement, paragraphStartInText + index + 1)
-                                    else -1
-                                if (closingIdx != -1) {
-                                    for(tag in tags) {
-                                        stack.add(tag)
-                                        writer.write("<$tag>")
-                                    }
-                                } else writer.write(replacement)
+            writer.write("<html><body><p>")
+            var index = 0
+            while(index <= text.lastIndex) {
+                var replaced = false
+                for((replacement, tags) in replacements) {
+                    if(text.startsWith(replacement, index)) {
+                        // Sort so we can handle stuff like "* text ** text***".
+                        if(stack.size >= tags.size && stack.takeLast(tags.size).sorted() == tags.sorted()) {
+                            val orderedTags = stack.takeLast(tags.size).reversed()
+                            for(tag in orderedTags) {
+                              stack.removeLast()
+                              writer.write("</$tag>")
                             }
-                            index += replacement.length
-                            replaced = true
-                            break
+                        } else {
+                            val closingIdx =
+                                if(index != text.lastIndex)
+                                    text.indexOf(replacement, index + 1)
+                                else -1
+                            if (closingIdx != -1) {
+                                for(tag in tags) {
+                                    stack.add(tag)
+                                    writer.write("<$tag>")
+                                }
+                            } else writer.write(replacement)
                         }
-                    }
-                    if (!replaced) {
-                        writer.write(paragraph[index].toString())
-                        index += 1
+                        index += replacement.length
+                        replaced = true
+                        break
                     }
                 }
-                writer.write("</p>")
-                // Account for "\n\n"
-                paragraphStartInText = paragraph.length + 2
+                if (!replaced) {
+                      writer.write(text[index].toString())
+                      index += 1
+                }
             }
-            writer.write("</body></html>")
+            writer.write("</p></body></html>")
         }
 }
 
