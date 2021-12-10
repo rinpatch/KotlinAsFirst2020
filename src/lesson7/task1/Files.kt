@@ -337,75 +337,57 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 
-enum class Style {
-    PARAGRAPH, STRIKEOUT, BOLD, ITALICS
-}
 
-fun lookAhead(line: String, index: Int): Char? =
-    if (index > line.lastIndex) null
-    else line[index]
+// This is a list because order of checking matters. Bold+italics should be checked before bold or italics.
+val replacements = listOf("***" to listOf("b", "i"), "**" to listOf("b"), "*" to listOf("i"), "~~" to listOf("s"))
 
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
+        val text = File(inputName).readText()
+        val paragraphs = text.split("\n\n")
+        val stack = mutableListOf<String>()
+
         File(outputName).bufferedWriter().use() { writer ->
-            writer.write("<html><body><p>")
-            val stack = ArrayDeque<Style>()
-            stack.add(Style.PARAGRAPH)
-            File(inputName).forEachLine { line ->
-                if (line.trim() == "") {
-                    if (!stack.isEmpty()) {
-                        // According to https://babelmark.github.io, most markdown
-                        // parcers do NOT allow styles that open in one paragraph and end
-                        // in another, instead dropping the style if not closed.
-                        while (stack.last() != Style.PARAGRAPH) stack.removeLast()
-                        stack.removeLast()
-                        writer.write("</p>")
-                    }
-                } else {
-                    if (stack.isEmpty()) {
-                        stack.add(Style.PARAGRAPH)
-                        writer.write("<p>")
-                    }
-                    val handle =
-                        {lookFor: Style, tag: String ->
-                            if(stack.last() == lookFor) {
-                                stack.removeLast()
-                                writer.write("</$tag>")
-                            } else {
-                                stack.add(lookFor)
-                                writer.write("<$tag>")
-                            }
-                        }
-                    var i = 0
-                    while(i <= line.lastIndex) {
-                        when(line[i]) {
-                            '~' -> if (lookAhead(line, i + 1) == '~') {
-                                    handle(Style.STRIKEOUT, "s")
-                                    i = i + 2
-                                   }
-                            '*' ->
-                                if(lookAhead(line, i + 1)  == '*' && lookAhead(line, i + 2) == '*') {
-                                    handle(Style.BOLD, "b")
-                                    handle(Style.ITALICS, "i")
-                                    i = i + 3
-                                } else if(lookAhead(line, i+1) == '*'){
-                                    handle(Style.BOLD, "b")
-                                    i = i + 2
-                                } else {
-                                    handle(Style.ITALICS, "i")
-                                    i = i + 1
+            writer.write("<html><body>")
+            for (paragraph in paragraphs) {
+                if(paragraph.trim(' ', '\n') == "") continue
+                writer.write("<p>")
+                var index = 0
+                while(index <= paragraph.lastIndex) {
+                    var replaced = false
+                    for((replacement, tags) in replacements) {
+                        if(paragraph.startsWith(replacement, index)) {
+                            // Sort so we can handle stuff like "* text ** text***".
+                            if(stack.size >= tags.size && stack.takeLast(tags.size).sorted() == tags.sorted()) {
+                                val orderedTags = stack.takeLast(tags.size).reversed()
+                                for(tag in orderedTags) {
+                                  stack.removeLast()
+                                  writer.write("</$tag>")
                                 }
-                           else -> {
-                             writer.write(line[i].toString())
-                             i = i + 1
-                           }
+                            } else {
+                                val closingIdx =
+                                    if(index != paragraph.lastIndex) paragraph.indexOf(replacement, index + 1)
+                                    else -1
+                                if (closingIdx != -1) {
+                                    for(tag in tags) {
+                                        stack.add(tag)
+                                        writer.write("<$tag>")
+                                    }
+                                } else writer.write(replacement)
+                            }
+                            index += replacement.length
+                            replaced = true
+                            break
+                        }
+                    }
+                    if (!replaced) {
+                        writer.write(paragraph[index].toString())
+                        index += 1
                     }
                 }
+                writer.write("</p>")
             }
-            writer.newLine()
+            writer.write("</body></html>")
         }
-        if (!stack.isEmpty() && stack.last() == Style.PARAGRAPH) writer.write("</p>")
-        writer.write("</body></html>")
-    }
 }
 
 /**
