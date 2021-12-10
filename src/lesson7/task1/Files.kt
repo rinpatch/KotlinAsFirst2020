@@ -348,6 +348,12 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 
         File(outputName).bufferedWriter().use() { writer ->
             writer.write("<html><body>")
+            // This stupid task mentions NOTHING about preserving styles between paragraphs
+            // NO mainstream Markdown parsers actually do this https://babelmark.github.io/?text=*te%0A%0Ast*
+            // Yet if you copy that behavior you will fail a test in kotoed with GARBAGE RANDOMLY GENERATED DATA
+            // That you have to sift through for 10 minutes to figure out what the issue is.
+            // So yeah, anyway, that's why this hack is here.
+            var paragraphStartInText = 0
             for (paragraph in paragraphs) {
                 if(paragraph.trim(' ', '\n') == "") continue
                 writer.write("<p>")
@@ -365,7 +371,8 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                                 }
                             } else {
                                 val closingIdx =
-                                    if(index != paragraph.lastIndex) paragraph.indexOf(replacement, index + 1)
+                                    if(index != paragraph.lastIndex)
+                                        text.indexOf(replacement, paragraphStartInText + index + 1)
                                     else -1
                                 if (closingIdx != -1) {
                                     for(tag in tags) {
@@ -385,6 +392,8 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                     }
                 }
                 writer.write("</p>")
+                // Account for "\n\n"
+                paragraphStartInText = paragraph.length + 2
             }
             writer.write("</body></html>")
         }
