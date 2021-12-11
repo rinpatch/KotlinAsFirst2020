@@ -11,6 +11,7 @@ class Tests {
         val matrix = createMatrix(4, 6, 0.0)
         assertEquals(4, matrix.height)
         assertEquals(6, matrix.width)
+        assertThrows(IllegalArgumentException::class.java) { createMatrix(0,0,0) }
     }
 
     @Test
