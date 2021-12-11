@@ -60,7 +60,46 @@ operator fun Matrix<Int>.plus(other: Matrix<Int>): Matrix<Int> {
  * 10 11 12  5
  *  9  8  7  6
  */
-fun generateSpiral(height: Int, width: Int): Matrix<Int> = TODO()
+
+fun generateSpiral(height: Int, width: Int): Matrix<Int> {
+    val matrix = createMatrix(height, width, 1)
+    var num = 1
+    var borderRight = width - 1
+    var borderLeft = 0
+    var borderTop = 0
+    var borderBottom = height - 1
+    while (num <= (width * height)) {
+        for(i in borderLeft..borderRight) {
+          matrix[borderTop, i] = num
+          num += 1
+        }
+        borderTop += 1
+        // When there are > 2 rows the borderRight downTo borderLeft loop
+        // below will overwrite the values without this. However we can't
+        // just check if borderTop==borderTop since if there are 2 rows
+        // it will produce incorrect results.
+        if (num > width * height) break
+
+        for(i in borderTop..borderBottom) {
+          matrix[i, borderRight] = num
+          num += 1
+        }
+        borderRight -= 1
+
+        for(i in borderRight downTo borderLeft) {
+          matrix[borderBottom, i] = num
+          num += 1
+        }
+        borderBottom -= 1
+
+        for(i in borderBottom downTo borderTop) {
+          matrix[i, borderLeft] = num
+          num += 1
+        }
+        borderLeft += 1
+    }
+    return matrix
+}
 
 /**
  * Сложная (5 баллов)
