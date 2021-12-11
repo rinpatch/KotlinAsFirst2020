@@ -269,6 +269,7 @@ fun solve(key: Matrix<Int>, lock: Matrix<Int>, offsetY: Int, offsetX: Int): Trip
     return if(downMatch.first == true) downMatch
            else rightMatch
 }
+
 fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int>  = solve(key, lock, 0, 0)
 
 /**
@@ -298,7 +299,42 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 0  4 13  6
  * 3 10 11  8
  */
-fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> = TODO()
+fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
+    var zeroX = -1
+    var zeroY = -1
+    for(y in 0 until matrix.height) {
+        for(x in 0 until matrix.width) {
+            when(val num = matrix[y, x]) {
+                0 -> if(zeroX == -1 && zeroY == -1) {
+                       zeroX = x
+                       zeroY = y
+                    } else throw IllegalStateException("[$y, $x]: More than one empty cell")
+                !in 1..15 -> throw IllegalStateException("[$y, $x]: $num is over 15")
+            }
+        }
+    }
+    for (move in moves) {
+        val possibleLocations = listOf(zeroY to zeroX + 1,
+                                       zeroY to zeroX - 1,
+                                       zeroY + 1 to zeroX,
+                                       zeroY - 1 to zeroX)
+        var moveExecuted = false
+        for((y,x) in possibleLocations) {
+            if(y in (0 until matrix.height) && x in (0 until matrix.width) && matrix[y, x] == move) {
+                matrix[zeroY, zeroX] = move
+                matrix[y, x] = 0
+                zeroX = x
+                zeroY = y
+                moveExecuted = true
+                break
+            }
+        }
+        if (!moveExecuted)
+            throw IllegalStateException("Impossible to execute move $move, no cell in acceptable range found")
+
+    }
+    return matrix
+}
 
 /**
  * Очень сложная (32 балла)
