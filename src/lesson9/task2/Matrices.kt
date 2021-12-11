@@ -250,7 +250,26 @@ operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int> = TODO(this.toSt
  * Вернуть тройку (Triple) -- (да/нет, требуемый сдвиг по высоте, требуемый сдвиг по ширине).
  * Если наложение невозможно, то первый элемент тройки "нет" и сдвиги могут быть любыми.
  */
-fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> = TODO()
+
+fun solve(key: Matrix<Int>, lock: Matrix<Int>, offsetY: Int, offsetX: Int): Triple<Boolean, Int, Int> {
+    var matches = true
+    for (y in 0 until key.height) {
+        for(x in 0 until key.width) {
+          matches = if (matches) key[y, x] != lock[y + offsetY, x + offsetX]
+                    else false
+        }
+    }
+    if (matches) return Triple(true, offsetY, offsetX)
+
+    val downMatch = if (offsetY + 1 + key.height <= lock.height) solve(key, lock, offsetY+1, offsetX)
+                    else Triple(false, offsetY, offsetX)
+    val rightMatch = if (offsetX + 1 + key.width <= lock.width) solve(key, lock, offsetY, offsetX+1)
+                    else Triple(false, offsetY, offsetX)
+
+    return if(downMatch.first == true) downMatch
+           else rightMatch
+}
+fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int>  = solve(key, lock, 0, 0)
 
 /**
  * Сложная (8 баллов)
