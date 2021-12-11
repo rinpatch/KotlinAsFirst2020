@@ -4,6 +4,8 @@ package lesson9.task2
 
 import lesson9.task1.Matrix
 import lesson9.task1.createMatrix
+import java.util.PriorityQueue
+import kotlin.math.abs
 
 // Все задачи в этом файле требуют наличия реализации интерфейса "Матрица" в Matrix.kt
 
@@ -299,7 +301,8 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 0  4 13  6
  * 3 10 11  8
  */
-fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
+
+fun validateMatrix(matrix: Matrix<Int>): Pair<Int,Int> {
     var zeroX = -1
     var zeroY = -1
     for(y in 0 until matrix.height) {
@@ -313,6 +316,12 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
             }
         }
     }
+    return zeroY to zeroX
+}
+
+fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
+    var (zeroY, zeroX) = validateMatrix(matrix)
+
     for (move in moves) {
         val possibleLocations = listOf(zeroY to zeroX + 1,
                                        zeroY to zeroX - 1,
@@ -375,4 +384,89 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
  *
  * Перед решением этой задачи НЕОБХОДИМО решить предыдущую
  */
-fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> = TODO()
+
+fun generateSolutions(): Pair<Matrix<Int>, Matrix<Int>> {
+    val solution1 = createMatrix(4, 4, 1)
+    val solution2 = createMatrix(4, 4, 1)
+
+    var num = 1
+    for (y in 0..3) {
+        for(x in 0..3) {
+            if(y == 3 && x == 3) {
+                solution1[y, x] = 0
+            } else {
+                solution1[y, x] = num
+            }
+            if(y == 3 && x == 1) solution2[y, x] = 15
+            else if (y == 3 && x == 2) solution2[y, x] = 14
+            else if (y == 3 && x == 3) solution2[y, x] = 0
+            else solution2[y, x] = num
+
+            num += 1
+        }
+    }
+    return solution1 to solution2
+}
+
+fun findInMatrix(matrix: Matrix<Int>, element: Int): Pair<Int,Int> {
+    for (y in 0 until matrix.height) {
+        for(x in 0 until matrix.width) if(matrix[y, x] == element) return y to x
+    }
+    return -1 to -1
+}
+
+fun manhattanDistance(source: Matrix<Int>, target: Matrix<Int>): Int {
+    var distance = 0
+    for(y in 0 until source.width) {
+        for(x in 0 until source.width) {
+            val (targetY, targetX) = findInMatrix(target, source[y, x])
+            distance += abs(targetX - x) + abs(targetY - y)
+        }
+    }
+    return distance
+}
+
+// Basically A* algorithm, except there is no path retracing because we do not 
+// care about the cheapest path, we just need to find one.
+fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
+    validateMatrix(matrix)
+
+    // Haven't found an easy way to do this at compile time
+    val (solution1, solution2) = generateSolutions()
+
+    val comparator: Comparator<Pair<Int, Pair<Matrix<Int>, List<Int>>>> = compareBy { it.first }
+
+    val queue = PriorityQueue<Pair<Int, Pair<Matrix<Int>, List<Int>>>>(comparator)
+
+    queue.add(manhattanDistance(matrix, solution1) to (matrix to listOf<Int>()))
+    val visited = mutableSetOf<Matrix<Int>>(matrix)
+
+    while(queue.isNotEmpty()) {
+        val (parentScore, data ) = queue.remove()
+        val (currentMatrix, path) = data
+        println("$parentScore $currentMatrix $path")
+
+        if (currentMatrix == solution1 || currentMatrix == solution2) return path
+
+        val (zeroY, zeroX) = findInMatrix(currentMatrix, 0)
+
+        val possibleMoves = listOf(zeroY to zeroX + 1,
+                                       zeroY to zeroX - 1,
+                                       zeroY + 1 to zeroX,
+                                       zeroY - 1 to zeroX)
+
+        for((y,x) in possibleMoves) {
+            if(y in (0 until matrix.height) && x in (0 until matrix.width)) {
+                val copy = currentMatrix.copy()
+                copy[zeroY, zeroX] = copy[y, x]
+                copy[y, x] = 0
+                val score = manhattanDistance(copy, solution1)
+                if(copy !in visited) {
+                  queue.add(score to (copy to path + copy[zeroY, zeroX]))
+                  visited.add(copy)
+                }
+            }
+        }
+    }
+    return listOf()
+}

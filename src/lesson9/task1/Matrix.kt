@@ -35,6 +35,16 @@ interface Matrix<E> {
     operator fun set(row: Int, column: Int, value: E)
 
     operator fun set(cell: Cell, value: E)
+
+    fun copy(): Matrix<E> {
+        val result = createMatrix(height, width, this[0, 0])
+        for (row in 0 until height) {
+            for (column in 0 until width) {
+                result[row, column] = this[row, column]
+            }
+        }
+        return result
+    }
 }
 
 /**
@@ -81,6 +91,13 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
       } else false
     }
 
+    override fun hashCode(): Int {
+        var result = height
+        result = 31 * result + width
+        result = 31 * result + list.hashCode()
+        return result
+    }
     override fun toString(): String = list.toString()
+
 }
 
