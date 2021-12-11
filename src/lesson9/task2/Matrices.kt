@@ -68,35 +68,30 @@ fun generateSpiral(height: Int, width: Int): Matrix<Int> {
     var borderLeft = 0
     var borderTop = 0
     var borderBottom = height - 1
+    val borders = mutableMapOf("right" to width - 1, "left" to 0, "top" to 0, "bottom" to height - 1)
+    val steps = listOf(Triple("left" to "right", "top", 1),
+                       Triple("top" to "bottom", "right", -1),
+                       Triple("right" to "left", "bottom", -1),
+                       Triple("bottom" to "top", "left", 1)
+                       )
+    var step = 0
     while (num <= (width * height)) {
-        for(i in borderLeft..borderRight) {
-          matrix[borderTop, i] = num
-          num += 1
-        }
-        borderTop += 1
-        // When there are > 2 rows the borderRight downTo borderLeft loop
-        // below will overwrite the values without this. However we can't
-        // just check if borderTop==borderTop since if there are 2 rows
-        // it will produce incorrect results.
-        if (num > width * height) break
+        val (range, fixedKey, increment) = steps[step]
+        val from = borders[range.first]!!
+        val to = borders[range.second]!!
 
-        for(i in borderTop..borderBottom) {
-          matrix[i, borderRight] = num
-          num += 1
+        val vertical = step % 2 == 1
+        val fixedValue = borders[fixedKey]!!
+        val actualRange =
+            if(from > to) from downTo to
+            else from..to
+        for (i in actualRange) {
+            if (vertical) matrix[i, fixedValue] = num
+            else matrix[fixedValue, i] = num
+            num += 1
         }
-        borderRight -= 1
-
-        for(i in borderRight downTo borderLeft) {
-          matrix[borderBottom, i] = num
-          num += 1
-        }
-        borderBottom -= 1
-
-        for(i in borderBottom downTo borderTop) {
-          matrix[i, borderLeft] = num
-          num += 1
-        }
-        borderLeft += 1
+        borders[fixedKey] = borders[fixedKey]!! + increment
+        step = (step + 1) % steps.size
     }
     return matrix
 }

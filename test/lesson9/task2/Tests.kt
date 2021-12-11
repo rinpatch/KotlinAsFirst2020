@@ -57,6 +57,18 @@ class Tests {
                 )
             ), generateSpiral(2, 2)
         )
+
+        assertEquals(
+            createMatrix(
+                3, 1,
+                listOf(
+                    listOf(1),
+                    listOf(2),
+                    listOf(3)
+                )
+            ), generateSpiral(3, 1)
+        )
+
         assertEquals(
             createMatrix(
                 3, 4,
