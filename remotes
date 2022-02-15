@@ -1,0 +1,6 @@
+origin	git@github.com:rinpatch/KotlinAsFirst2020.git (fetch)
+origin	git@github.com:rinpatch/KotlinAsFirst2020.git (push)
+upstream-my	git@github.com:rinpatch/KotlinAsFirst2021.git (fetch)
+upstream-my	git@github.com:rinpatch/KotlinAsFirst2021.git (push)
+upstream-theirs	git@github.com:tuchkovdima/KotlinAsFirst.git (fetch)
+upstream-theirs	git@github.com:tuchkovdima/KotlinAsFirst.git (push)
